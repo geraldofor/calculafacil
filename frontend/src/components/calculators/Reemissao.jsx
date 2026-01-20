@@ -161,10 +161,20 @@ const Reemissao = () => {
       const pad = 12;
 
       let outputText = '';
+      
+      // Cabeçalho
       outputText += `       CÁLCULO DE REMARCAÇÃO - ADT\n`;
       outputText += `       Data: ${dataExibicao}\n`;
       outputText += `       Cotação USD: R$ ${cotacao.toFixed(4).replace('.', ',')}\n`;
       outputText += `       FEE: U$ ${feeUSDFormatted}\n`;
+      
+      // Mostrar markup se aplicado
+      if (tarifaComMarkup) {
+        outputText += `       MARKUP: ${formData.markup}% aplicado\n`;
+        outputText += `       OLD FARE: USD ${oldBaseFareUSDOriginal.toFixed(2)} → USD ${oldBaseFareUSD.toFixed(2)}\n`;
+        outputText += `       NEW FARE: USD ${newBaseFareUSDOriginal.toFixed(2)} → USD ${newBaseFareUSD.toFixed(2)}\n`;
+      }
+      
       outputText += `       ---------------------------------------\n\n`;
 
       // PASSAGEIROS (múltiplos - novo formato)
