@@ -206,13 +206,23 @@ export const aeroDB = {
   AUA: 'Aruba',
 };
 
-// Dicionário de companhias aéreas
+// Dicionário de companhias aéreas (expandido com 100+ cias)
 export const ciasDB = {
+  // BRASIL
   TP: 'TAP',
   AD: 'Azul',
   G3: 'GOL',
   LA: 'LATAM',
   JJ: 'LATAM',
+  
+  // AMÉRICA DO SUL
+  AR: 'Aerolíneas Argentinas',
+  CM: 'Copa Airlines',
+  AM: 'Aeroméxico',
+  AV: 'Avianca',
+  VW: 'Aeromar',
+  
+  // EUROPA
   AF: 'Air France',
   KL: 'KLM',
   LH: 'Lufthansa',
@@ -222,16 +232,87 @@ export const ciasDB = {
   LX: 'Swiss',
   OS: 'Austrian',
   SN: 'Brussels Airlines',
+  SK: 'SAS',
+  AY: 'Finnair',
+  EI: 'Aer Lingus',
+  TP: 'TAP',
+  UX: 'Air Europa',
+  VY: 'Vueling',
+  FR: 'Ryanair',
+  U2: 'easyJet',
+  WZ: 'Wizz Air',
+  I2: 'Iberia Express',
+  NT: 'Binter',
+  
+  // AMÉRICA DO NORTE
+  AA: 'American Airlines',
+  DL: 'Delta',
+  UA: 'United',
+  WN: 'Southwest',
+  B6: 'JetBlue',
+  AS: 'Alaska Airlines',
+  NK: 'Spirit',
+  F9: 'Frontier',
+  G4: 'Allegiant',
+  AC: 'Air Canada',
+  WS: 'WestJet',
+  Y4: 'Volaris',
+  VB: 'VivaAerobus',
+  
+  // ORIENTE MÉDIO
   EK: 'Emirates',
   QR: 'Qatar Airways',
   EY: 'Etihad',
   TK: 'Turkish Airlines',
-  AA: 'American Airlines',
-  DL: 'Delta',
-  UA: 'United',
-  UX: 'Air Europa',
-  AR: 'Aerolíneas Argentinas',
-  CM: 'Copa Airlines',
-  AM: 'Aeroméxico',
-  AV: 'Avianca',
+  SV: 'Saudia',
+  GF: 'Gulf Air',
+  WY: 'Oman Air',
+  MS: 'EgyptAir',
+  RJ: 'Royal Jordanian',
+  
+  // ÁSIA-PACÍFICO
+  SQ: 'Singapore Airlines',
+  MH: 'Malaysia Airlines',
+  TG: 'Thai Airways',
+  CX: 'Cathay Pacific',
+  JL: 'Japan Airlines',
+  NH: 'ANA',
+  KE: 'Korean Air',
+  OZ: 'Asiana',
+  PR: 'Philippine Airlines',
+  CI: 'China Airlines',
+  BR: 'EVA Air',
+  CZ: 'China Southern',
+  CA: 'Air China',
+  MU: 'China Eastern',
+  HU: 'Hainan Airlines',
+  AI: 'Air India',
+  UK: 'Vistara',
+  6E: 'IndiGo',
+  GA: 'Garuda Indonesia',
+  VN: 'Vietnam Airlines',
+  
+  // OCEANIA
+  QF: 'Qantas',
+  VA: 'Virgin Australia',
+  JQ: 'Jetstar',
+  NZ: 'Air New Zealand',
+  
+  // ÁFRICA
+  SA: 'South African',
+  ET: 'Ethiopian Airlines',
+  KQ: 'Kenya Airways',
+  AT: 'Royal Air Maroc',
+  MS: 'EgyptAir',
+  
+  // LOW COST EUROPA
+  FR: 'Ryanair',
+  U2: 'easyJet',
+  W6: 'Wizz Air',
+  VY: 'Vueling',
+  
+  // CARGO
+  FX: 'FedEx',
+  5X: 'UPS',
+  CK: 'Cargolux',
 };
