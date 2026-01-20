@@ -24,6 +24,8 @@ const Tarifa = () => {
     multaReem: '',
     multaReeb: '',
     parcelamento: '10x sem juros',
+    aplicarMarkup: false,
+    markup: '10',
   });
 
   const processarTarifa = async () => {
