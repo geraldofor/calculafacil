@@ -386,6 +386,38 @@ const Reemissao = () => {
         </div>
       </div>
 
+      {/* Form Inputs - Row 3 (New Multi-line Fields) */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div>
+          <Label>Passageiros (múltiplos)</Label>
+          <Textarea
+            rows={3}
+            value={formData.passageiros}
+            onChange={(e) => setFormData({ ...formData, passageiros: e.target.value })}
+            placeholder="Nome 1&#10;Nome 2&#10;Nome 3..."
+            className="text-sm"
+          />
+        </div>
+        <div>
+          <Label>Roteiro (múltiplas linhas)</Label>
+          <Textarea
+            rows={3}
+            value={formData.roteiro}
+            onChange={(e) => setFormData({ ...formData, roteiro: e.target.value })}
+            placeholder="GRU-MIA 10JAN&#10;MIA-JFK 10JAN&#10;JFK-MIA 20JAN..."
+            className="text-sm"
+          />
+        </div>
+        <div>
+          <Label>LOC</Label>
+          <Input
+            value={formData.loc}
+            onChange={(e) => setFormData({ ...formData, loc: e.target.value })}
+            placeholder="Localizador"
+          />
+        </div>
+      </div>
+
       {/* Action Buttons */}
       <div className="flex gap-2 mb-4">
         <Button onClick={processarReemissaoAmadeus} data-testid="calcular-button">
