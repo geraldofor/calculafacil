@@ -139,12 +139,43 @@ const Reemissao = () => {
       outputText += `       FEE: U$ ${feeUSDFormatted}\n`;
       outputText += `       ---------------------------------------\n\n`;
 
-      if (formData.passageiro || formData.rota || formData.ticketOriginal) {
-        outputText += `PASSAGEIRO: ${formData.passageiro || 'NÃO INFORMADO'}\n`;
-        outputText += `ROTA: ${formData.rota || 'NÃO INFORMADA'}\n`;
-        if (formData.ticketOriginal) outputText += `TICKET ORIGINAL: ${formData.ticketOriginal}\n`;
-        outputText += `----------------------------------------\n\n`;
+      // PASSAGEIROS (múltiplos - novo formato)
+      if (formData.passageiros && formData.passageiros.trim()) {
+        const linhasPassageiros = formData.passageiros.trim().split('\n');
+        outputText += `PASSAGEIRO:  ${linhasPassageiros[0]}\n`;
+        for (let i = 1; i < linhasPassageiros.length; i++) {
+          outputText += `             ${linhasPassageiros[i]}\n`;
+        }
+        outputText += `\n`;
+      } else if (formData.passageiro) {
+        // Fallback para campo antigo
+        outputText += `PASSAGEIRO: ${formData.passageiro}\n\n`;
       }
+
+      // ROTEIRO (múltiplas linhas - novo formato)
+      if (formData.roteiro && formData.roteiro.trim()) {
+        const linhasRoteiro = formData.roteiro.trim().split('\n');
+        outputText += `ROTA:   ${linhasRoteiro[0]}\n`;
+        for (let i = 1; i < linhasRoteiro.length; i++) {
+          outputText += `        ${linhasRoteiro[i]}\n`;
+        }
+        outputText += `\n`;
+      } else if (formData.rota) {
+        // Fallback para campo antigo
+        outputText += `ROTA: ${formData.rota}\n\n`;
+      }
+
+      // LOC
+      if (formData.loc) {
+        outputText += `LOC.: ${formData.loc}\n `;
+      }
+
+      // TICKET ORIGINAL
+      if (formData.ticketOriginal) {
+        outputText += `\nTICKET ORIGINAL: ${formData.ticketOriginal}\n`;
+      }
+      
+      outputText += `----------------------------------------\n\n`;
 
       outputText += `Diferença de tarifa (R$)     R$ ${formatVal(baseCalculoBRL).padStart(pad)}\n`;
       outputText += `Diferença de taxas           R$ ${formatVal(difTaxasCalculada).padStart(pad)}\n`;
@@ -158,6 +189,7 @@ const Reemissao = () => {
       outputText += `----------------------------------------\n`;
       outputText += `TOTAL POR PAX                R$ ${formatVal(totalPorPax).padStart(pad)}\n`;
       outputText += `========================================\n`;
+      outputText += `***VALORES POR PAX SUJEITOS A ALTERAÇÃO***\n\n`;
 
       outputText += `\nCONFERÊNCIA GDS:\n`;
       outputText += `TICKET DIFFERENCE            R$ ${formatVal(ticketDifferenceBRL).padStart(pad)}\n`;
