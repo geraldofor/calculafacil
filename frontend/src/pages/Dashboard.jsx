@@ -127,6 +127,7 @@ const Dashboard = () => {
           {activeTab === 'tarifa' && <Tarifa />}
           {activeTab === 'conversor' && <Conversor />}
           {activeTab === 'reemissao' && <Reemissao />}
+          {activeTab === 'admin' && isAdmin && <Admin />}
         </div>
       </div>
     </div>
