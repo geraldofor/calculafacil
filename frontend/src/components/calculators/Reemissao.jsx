@@ -59,6 +59,8 @@ const Reemissao = () => {
 
       // EXPRESSÕES REGULARES PARA AMADEUS
       const patterns = {
+        oldBaseFareUSD: /OLD\s+BASE\s+FARE\s+USD\s+([\-\d,.]+)/i,
+        newBaseFareUSD: /NEW\s+BASE\s+FARE\s+USD\s+([\-\d,.]+)/i,
         fareBalanceBRL: /FARE\s+BALANCE\s+BRL\s+([\-\d,.]+)/i,
         taxBalanceBRL: /TAX\s+BALANCE\s+BRL\s+([\-\d,.]+)/i,
         residualValueBRL: /RESIDUAL\s+VALUE\s+BRL\s+([\-\d,.]+)/i,
@@ -80,13 +82,39 @@ const Reemissao = () => {
       };
 
       // EXTRAIR VALORES
-      const fareBalanceBRL = extractValueAmadeus(patterns.fareBalanceBRL);
+      let oldBaseFareUSD = extractValueAmadeus(patterns.oldBaseFareUSD);
+      let newBaseFareUSD = extractValueAmadeus(patterns.newBaseFareUSD);
+      let fareBalanceBRL = extractValueAmadeus(patterns.fareBalanceBRL);
       const taxBalanceBRL = extractValueAmadeus(patterns.taxBalanceBRL);
       const residualValueBRL = extractValueAmadeus(patterns.residualValueBRL);
       const penaltyBRL = extractValueAmadeus(patterns.penaltyBRL);
       const ticketDifferenceBRL = extractValueAmadeus(patterns.ticketDifferenceBRL);
       const totalAddColBRL = extractValueAmadeus(patterns.totalAddCollBRL);
       const nonRefundableTaxBRL = extractValueAmadeus(patterns.nonRefundableTaxBRL);
+
+      // APLICAR MARKUP se ativo
+      let oldBaseFareUSDOriginal = oldBaseFareUSD;
+      let newBaseFareUSDOriginal = newBaseFareUSD;
+      let fareBalanceBRLOriginal = fareBalanceBRL;
+      let tarifaComMarkup = false;
+      
+      if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
+        const markupPercent = parseFloat(formData.markup);
+        
+        // Aplicar markup nas tarifas USD
+        if (oldBaseFareUSD > 0) {
+          oldBaseFareUSD = oldBaseFareUSD / (1 - markupPercent / 100);
+        }
+        if (newBaseFareUSD > 0) {
+          newBaseFareUSD = newBaseFareUSD / (1 - markupPercent / 100);
+        }
+        
+        // Recalcular FARE BALANCE em BRL com markup
+        const fareBalanceUSD = newBaseFareUSD - oldBaseFareUSD;
+        fareBalanceBRL = fareBalanceUSD * cotacao;
+        
+        tarifaComMarkup = true;
+      }
 
       // CÁLCULOS
       let baseCalculoBRL = fareBalanceBRL;
