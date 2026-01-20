@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '@/services/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Calculator, LogOut, User, History } from 'lucide-react';
+import { Calculator, LogOut, User, History, Shield } from 'lucide-react';
 import Tarifa from '@/components/calculators/Tarifa';
 import Conversor from '@/components/calculators/Conversor';
 import Reemissao from '@/components/calculators/Reemissao';
+import Admin from '@/pages/Admin';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('tarifa');
   const user = authService.getCurrentUser();
+  const isAdmin = user?.role === 'admin';
 
   const handleLogout = () => {
     authService.logout();
@@ -74,6 +76,24 @@ const Dashboard = () => {
             <Calculator className="h-5 w-5" />
             Reemissão
           </button>
+
+          {isAdmin && (
+            <>
+              <div className="my-4 border-t border-gray-700"></div>
+              <button
+                className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition ${
+                  activeTab === 'admin'
+                    ? 'bg-white/10 text-white border-l-4 border-blue-500'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+                onClick={() => setActiveTab('admin')}
+                data-testid="tab-admin"
+              >
+                <Shield className="h-5 w-5" />
+                Admin
+              </button>
+            </>
+          )}
         </nav>
       </div>
 
