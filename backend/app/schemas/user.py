@@ -14,7 +14,11 @@ class UserResponse(BaseModel):
     id: str
     email: EmailStr
     full_name: str
+    role: str
     is_active: bool
+    subscription_status: str
+    created_at: datetime
+    last_login: Optional[datetime] = None
 
 class Token(BaseModel):
     access_token: str
