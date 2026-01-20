@@ -117,6 +117,12 @@ async def login(credentials: UserLogin):
             detail="Account is inactive"
         )
     
+    # Update last login
+    await db.users.update_one(
+        {"id": user.id},
+        {"$set": {"last_login": datetime.utcnow().isoformat()}}
+    )
+    
     # Create access token
     access_token = create_access_token(data={"sub": user.id})
     
@@ -127,7 +133,11 @@ async def login(credentials: UserLogin):
             id=user.id,
             email=user.email,
             full_name=user.full_name,
-            is_active=user.is_active
+            role=user.role,
+            is_active=user.is_active,
+            subscription_status=user.subscription_status,
+            created_at=user.created_at,
+            last_login=datetime.utcnow()
         )
     )
 
