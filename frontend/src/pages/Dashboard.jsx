@@ -26,8 +26,8 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-[#001e3c] text-white flex flex-direction column p-5" data-testid="dashboard-sidebar">
-        <div className="mb-8">
+      <div className="w-64 bg-[#001e3c] text-white flex flex-col p-5" data-testid="dashboard-sidebar">
+        <div className="mb-12 pb-6 border-b border-gray-700">
           <div className="flex items-center gap-2 mb-2">
             <Calculator className="h-6 w-6" />
             <span className="text-xl font-bold">CALCULA FÁCIL</span>
@@ -35,7 +35,7 @@ const Dashboard = () => {
           <p className="text-xs text-gray-400">Sistema Unificado</p>
         </div>
 
-        <nav className="flex-1">
+        <nav className="flex-1 mt-4">
           <button
             className={`w-full text-left px-4 py-3 rounded-lg mb-2 flex items-center gap-3 transition ${
               activeTab === 'tarifa'
