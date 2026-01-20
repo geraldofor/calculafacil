@@ -4,6 +4,7 @@ import logging
 from app.core.config import settings
 from app.core.database import connect_to_mongo, close_mongo_connection
 from app.api import auth, calculations
+from app.api import admin as admin_routes
 
 # Configure logging
 logging.basicConfig(
