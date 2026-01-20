@@ -62,10 +62,33 @@ const Tarifa = () => {
 
       // APLICAR MARKUP se ativo
       let tUSDOriginal = tUSD;
+      let tBRLOriginal = tBRL;
+      let totalBRLOriginal = totalBRL;
       let tarifaComMarkup = false;
+      
       if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
         const markupPercent = parseFloat(formData.markup);
+        
+        // Calcular novo USD com markup
         tUSD = tUSD / (1 - markupPercent / 100);
+        
+        // Recalcular BRL baseado no novo USD
+        // Extrair cotação do GDS (RATE USED ou calcular)
+        let cotacao = 1;
+        const rateMatch = raw.match(/RATE USED 1USD=(\d+\.\d+)/i);
+        if (rateMatch) {
+          cotacao = parseFloat(rateMatch[1]);
+        } else if (tUSDOriginal > 0 && tBRLOriginal > 0) {
+          cotacao = tBRLOriginal / tUSDOriginal;
+        }
+        
+        // Recalcular tarifa BRL com markup
+        tBRL = tUSD * cotacao;
+        
+        // Recalcular total BRL (nova tarifa + taxas)
+        const taxas = totalBRLOriginal - tBRLOriginal;
+        totalBRL = tBRL + taxas;
+        
         tarifaComMarkup = true;
       }
 
@@ -79,11 +102,13 @@ const Tarifa = () => {
         res += `Tarifa Base USD (original): USD ${tUSDOriginal.toFixed(2)}\n`;
         res += `Markup (${formData.markup}%):          USD ${(tUSD - tUSDOriginal).toFixed(2)}\n`;
         res += `Tarifa USD (c/ markup):     USD ${tUSD.toFixed(2).padStart(12)}\n`;
+        res += `Tarifa BRL (c/ markup): BRL ${tBRL.toFixed(2).padStart(12)}\n`;
       } else {
         res += `Tarifa Base (USD):  USD ${tUSD.toFixed(2).padStart(12)}\n`;
+        res += `Tarifa BRL:         BRL ${tBRL.toFixed(2).padStart(12)}\n`;
       }
       
-      res += `Tarifa BRL:         BRL ${tBRL.toFixed(2).padStart(12)}\nTaxas:              BRL ${(totalBRL - tBRL).toFixed(2).padStart(12)}\nTotal Parcial:      BRL ${totalBRL.toFixed(2).padStart(12)}\nRAV (${formData.rav}%):          BRL ${ravVal.toFixed(2).padStart(12)}\nFEE:                BRL ${feeVal.toFixed(2).padStart(12)}\n-------------------------------------------\nTOTAL FINAL:        BRL ${final.toFixed(2).padStart(12)}\n-------------------------------------------\nPagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
+      res += `Taxas:              BRL ${(totalBRL - tBRL).toFixed(2).padStart(12)}\nTotal Parcial:      BRL ${totalBRL.toFixed(2).padStart(12)}\nRAV (${formData.rav}%):          BRL ${ravVal.toFixed(2).padStart(12)}\nFEE:                BRL ${feeVal.toFixed(2).padStart(12)}\n-------------------------------------------\nTOTAL FINAL:        BRL ${final.toFixed(2).padStart(12)}\n-------------------------------------------\nPagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
 
       setResult(res);
 
