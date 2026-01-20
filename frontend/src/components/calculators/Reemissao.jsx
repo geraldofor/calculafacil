@@ -257,6 +257,7 @@ const Reemissao = () => {
       roteiro: '',
       loc: '',
       dataEmissao: new Date().toISOString().split('T')[0],
+      aplicarMarkup: false,
     });
     setResult('Cole o resumo Amadeus (ET*) e clique em CALCULAR');
     toast({
