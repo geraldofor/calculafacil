@@ -332,10 +332,10 @@ const Reemissao = () => {
           AMADEUS
         </Button>
         <Button variant="outline" size="sm" disabled>
-          SABRE (em breve)
+          GALILEO (OCR) (em breve)
         </Button>
         <Button variant="outline" size="sm" disabled>
-          GALILEO (em breve)
+          SABRE (em breve)
         </Button>
       </div>
 
