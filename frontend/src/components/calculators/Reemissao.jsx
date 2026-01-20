@@ -252,7 +252,10 @@ const Reemissao = () => {
       ...formData,
       ticketOriginal: '',
       passageiro: '',
+      passageiros: '',
       rota: '',
+      roteiro: '',
+      loc: '',
       dataEmissao: new Date().toISOString().split('T')[0],
     });
     setResult('Cole o resumo Amadeus (ET*) e clique em CALCULAR');
