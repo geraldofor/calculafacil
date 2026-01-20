@@ -50,3 +50,4 @@ async def health_check():
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(calculations.router, prefix="/api/calculations", tags=["Calculations"])
+app.include_router(admin_routes.router, prefix="/api/admin", tags=["Admin"])
