@@ -22,8 +22,13 @@ const Reemissao = () => {
     ravMinimo: '200',
     ticketOriginal: '',
     passageiro: '',
+    passageiros: '',
     rota: '',
+    roteiro: '',
+    loc: '',
     dataEmissao: new Date().toISOString().split('T')[0],
+    aplicarMarkup: false,
+    markup: '10',
   });
 
   const processarReemissaoAmadeus = async () => {
