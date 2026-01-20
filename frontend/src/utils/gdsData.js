@@ -288,7 +288,7 @@ export const ciasDB = {
   HU: 'Hainan Airlines',
   AI: 'Air India',
   UK: 'Vistara',
-  6E: 'IndiGo',
+  '6E': 'IndiGo',
   GA: 'Garuda Indonesia',
   VN: 'Vietnam Airlines',
   
