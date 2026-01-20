@@ -60,12 +60,30 @@ const Tarifa = () => {
         totalBRL = totM ? parseFloat(totM[1]) : 0;
       }
 
+      // APLICAR MARKUP se ativo
+      let tUSDOriginal = tUSD;
+      let tarifaComMarkup = false;
+      if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
+        const markupPercent = parseFloat(formData.markup);
+        tUSD = tUSD / (1 - markupPercent / 100);
+        tarifaComMarkup = true;
+      }
+
       const ravVal = tBRL * (parseFloat(formData.rav) / 100);
       const feeVal = parseFloat(formData.fee || 0);
       const final = totalBRL + ravVal + feeVal;
 
       let res = `Cia/Voo: ${formData.voo}\nCabine: ${formData.cabine}\nBagagem: ${formData.bagagem}\n-------------------------------------------\n`;
-      res += `Tarifa Base (USD):  USD ${tUSD.toFixed(2).padStart(12)}\nTarifa BRL:         BRL ${tBRL.toFixed(2).padStart(12)}\nTaxas:              BRL ${(totalBRL - tBRL).toFixed(2).padStart(12)}\nTotal Parcial:      BRL ${totalBRL.toFixed(2).padStart(12)}\nRAV (${formData.rav}%):          BRL ${ravVal.toFixed(2).padStart(12)}\nFEE:                BRL ${feeVal.toFixed(2).padStart(12)}\n-------------------------------------------\nTOTAL FINAL:        BRL ${final.toFixed(2).padStart(12)}\n-------------------------------------------\nPagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
+      
+      if (tarifaComMarkup) {
+        res += `Tarifa Base USD (original): USD ${tUSDOriginal.toFixed(2)}\n`;
+        res += `Markup (${formData.markup}%):          USD ${(tUSD - tUSDOriginal).toFixed(2)}\n`;
+        res += `Tarifa USD (c/ markup):     USD ${tUSD.toFixed(2).padStart(12)}\n`;
+      } else {
+        res += `Tarifa Base (USD):  USD ${tUSD.toFixed(2).padStart(12)}\n`;
+      }
+      
+      res += `Tarifa BRL:         BRL ${tBRL.toFixed(2).padStart(12)}\nTaxas:              BRL ${(totalBRL - tBRL).toFixed(2).padStart(12)}\nTotal Parcial:      BRL ${totalBRL.toFixed(2).padStart(12)}\nRAV (${formData.rav}%):          BRL ${ravVal.toFixed(2).padStart(12)}\nFEE:                BRL ${feeVal.toFixed(2).padStart(12)}\n-------------------------------------------\nTOTAL FINAL:        BRL ${final.toFixed(2).padStart(12)}\n-------------------------------------------\nPagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
 
       setResult(res);
 
