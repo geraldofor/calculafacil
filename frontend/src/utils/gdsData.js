@@ -313,6 +313,6 @@ export const ciasDB = {
   
   // CARGO
   FX: 'FedEx',
-  5X: 'UPS',
+  '5X': 'UPS',
   CK: 'Cargolux',
 };
