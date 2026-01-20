@@ -231,6 +231,40 @@ const Tarifa = () => {
         </div>
       </div>
 
+      {/* Markup Section */}
+      <div className="border-t pt-4 mb-4">
+        <div className="flex items-center gap-4 mb-3">
+          <input
+            type="checkbox"
+            id="aplicarMarkup"
+            checked={formData.aplicarMarkup}
+            onChange={(e) => setFormData({ ...formData, aplicarMarkup: e.target.checked })}
+            className="w-4 h-4"
+          />
+          <Label htmlFor="aplicarMarkup" className="cursor-pointer mb-0">
+            Aplicar Markup (tarifas net-net sem parcelamento)
+          </Label>
+        </div>
+        
+        {formData.aplicarMarkup && (
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>Markup %</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.markup}
+                onChange={(e) => setFormData({ ...formData, markup: e.target.value })}
+                placeholder="Ex: 10"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Exemplo: 10% = divide por 0.90
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Action Buttons */}
       <div className="flex gap-2 mb-4">
         <Button onClick={processarTarifa} data-testid="calcular-button">
