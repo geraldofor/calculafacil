@@ -364,20 +364,22 @@ const Reemissao = () => {
           />
         </div>
         <div>
-          <Label>Passageiro</Label>
+          <Label>Passageiro (simples)</Label>
           <Input
             value={formData.passageiro}
             onChange={(e) => setFormData({ ...formData, passageiro: e.target.value })}
             placeholder="Nome completo"
           />
+          <p className="text-xs text-gray-500 mt-1">Use campo abaixo para múltiplos</p>
         </div>
         <div>
-          <Label>Rota</Label>
+          <Label>Rota (simples)</Label>
           <Input
             value={formData.rota}
             onChange={(e) => setFormData({ ...formData, rota: e.target.value })}
             placeholder="Ex: GRU-MIA-JFK"
           />
+          <p className="text-xs text-gray-500 mt-1">Use campo abaixo para roteiro completo</p>
         </div>
         <div>
           <Label>Data</Label>
@@ -387,6 +389,73 @@ const Reemissao = () => {
             onChange={(e) => setFormData({ ...formData, dataEmissao: e.target.value })}
           />
         </div>
+      </div>
+
+      {/* Form Inputs - Row 3 (Passageiros Múltiplos + Roteiro + LOC) */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <div>
+          <Label>Passageiros (múltiplos)</Label>
+          <Textarea
+            rows={3}
+            value={formData.passageiros}
+            onChange={(e) => setFormData({ ...formData, passageiros: e.target.value })}
+            placeholder="1.SOBRENOME/NOME TITLE&#10;2.SOBRENOME/NOME TITLE"
+            className="text-sm font-mono"
+          />
+        </div>
+        <div>
+          <Label>Roteiro (voos GDS)</Label>
+          <Textarea
+            rows={3}
+            value={formData.roteiro}
+            onChange={(e) => setFormData({ ...formData, roteiro: e.target.value })}
+            placeholder="3  LA8084 L 23JAN 5 GRULHR HK2  2340 1405+1&#10;4  LX 317 H 27JAN 2 LHRZRH HK2  0900 1155"
+            className="text-sm font-mono"
+          />
+        </div>
+        <div>
+          <Label>LOC (Localizador)</Label>
+          <Input
+            value={formData.loc}
+            onChange={(e) => setFormData({ ...formData, loc: e.target.value })}
+            placeholder="Ex: B2C7JN"
+            className="font-mono"
+          />
+        </div>
+      </div>
+
+      {/* Markup Section */}
+      <div className="border-t pt-4 mb-4">
+        <div className="flex items-center gap-4 mb-3">
+          <input
+            type="checkbox"
+            id="aplicarMarkupReem"
+            checked={formData.aplicarMarkup}
+            onChange={(e) => setFormData({ ...formData, aplicarMarkup: e.target.checked })}
+            className="w-4 h-4"
+          />
+          <Label htmlFor="aplicarMarkupReem" className="cursor-pointer mb-0">
+            Aplicar Markup na tarifa (tarifas net-net)
+          </Label>
+        </div>
+        
+        {formData.aplicarMarkup && (
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>Markup %</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={formData.markup}
+                onChange={(e) => setFormData({ ...formData, markup: e.target.value })}
+                placeholder="Ex: 10"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Aplica fórmula: tarifa ÷ (1 - markup%)
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Form Inputs - Row 3 (New Multi-line Fields) */}
