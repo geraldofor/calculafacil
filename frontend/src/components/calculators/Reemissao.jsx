@@ -332,15 +332,22 @@ const Reemissao = () => {
         >
           AMADEUS
         </Button>
-        <Button variant="outline" size="sm" disabled>
-          GALILEO (OCR) (em breve)
+        <Button
+          variant={gds === 'galileo' ? 'default' : 'outline'}
+          onClick={() => setGds('galileo')}
+          size="sm"
+        >
+          GALILEO (OCR)
         </Button>
         <Button variant="outline" size="sm" disabled>
           SABRE (em breve)
         </Button>
       </div>
 
-      {/* Input Textarea */}
+      {/* Renderizar componente baseado no GDS */}
+      {gds === 'amadeus' && (
+        <div>
+          {/* Conteúdo Amadeus atual */}
       <div className="mb-4">
         <Label>Resumo Amadeus - ET* (Formato: 795.00, 1,234.56, -24.00)</Label>
         <Textarea
