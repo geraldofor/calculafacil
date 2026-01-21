@@ -346,7 +346,7 @@ const Reemissao = () => {
 
       {/* Renderizar componente baseado no GDS */}
       {gds === 'amadeus' && (
-        <div>
+        <>
           {/* Conteúdo Amadeus atual */}
       <div className="mb-4">
         <Label>Resumo Amadeus - ET* (Formato: 795.00, 1,234.56, -24.00)</Label>
