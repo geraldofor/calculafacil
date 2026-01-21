@@ -557,6 +557,11 @@ const Reemissao = () => {
       <div className="bg-[#1a202c] text-green-400 p-4 rounded-md font-mono text-sm whitespace-pre-wrap" data-testid="reemissao-result">
         {result}
       </div>
+        </div>
+      )}
+
+      {/* Galileo OCR */}
+      {gds === 'galileo' && <ReemissaoGalileo />}
     </Card>
   );
 };
