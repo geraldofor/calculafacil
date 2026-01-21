@@ -8,6 +8,7 @@ import { Copy, Calculator as CalcIcon, Trash2 } from 'lucide-react';
 import { copyToClipboard, formatDate } from '@/utils/formatters';
 import { calculationService } from '@/services/calculations';
 import { useToast } from '@/hooks/use-toast';
+import ReemissaoGalileo from './ReemissaoGalileo';
 
 const Reemissao = () => {
   const { toast } = useToast();
