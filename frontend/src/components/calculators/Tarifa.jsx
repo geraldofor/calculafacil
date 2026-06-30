@@ -8,6 +8,67 @@ import { Copy, Calculator as CalcIcon } from 'lucide-react';
 import { copyToClipboard } from '@/utils/formatters';
 import { calculationService } from '@/services/calculations';
 import { useToast } from '@/hooks/use-toast';
+import { aeroDB, ciasDB } from '@/utils/gdsData';
+
+const decodeItinerary = (text) => {
+  if (!text) return null;
+  const lines = text.toUpperCase().split('\n');
+  const flights = [];
+
+  lines.forEach((line) => {
+    if (!line.trim()) return;
+
+    // Clean up prefix like "2. " or "2 " or "  2.  "
+    const cleanedLine = line.replace(/^\s*\d+\.?\s+/, '').trim();
+
+    // Regex for GDS flight lines
+    const match = cleanedLine.match(
+      /^([A-Z0-9]{2})\s*(\d{1,5})\s*([A-Z])?\s+(\d{2}[A-Z]{3})\s*[1-7]?[\*]?\s*([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d?)\s+[^0-9]*(\d{4})\s+[^0-9]*(\d{4})/
+    );
+
+    if (match) {
+      const cia = ciasDB[match[1]] || match[1];
+      const orgCode = match[5];
+      const dstCode = match[6];
+      const org = aeroDB[orgCode] ? `${aeroDB[orgCode]} (${orgCode})` : `${orgCode} (${orgCode})`;
+      const dst = aeroDB[dstCode] ? `${aeroDB[dstCode]} (${dstCode})` : `${dstCode} (${dstCode})`;
+      const dep = `${match[8].slice(0, 2)}:${match[8].slice(2)}`;
+      const arr = `${match[9].slice(0, 2)}:${match[9].slice(2)}`;
+      const date = match[4];
+
+      flights.push({
+        ciaCode: match[1],
+        cia,
+        numero: match[2],
+        data: date,
+        origem: org,
+        destino: dst,
+        partida: dep,
+        chegada: arr,
+      });
+    }
+  });
+
+  if (flights.length === 0) return null;
+
+  let maxOrigem = 0;
+  let maxDestino = 0;
+  flights.forEach((f) => {
+    if (f.origem.length > maxOrigem) maxOrigem = f.origem.length;
+    if (f.destino.length > maxDestino) maxDestino = f.destino.length;
+  });
+  maxOrigem += 2;
+  maxDestino += 2;
+
+  let res = '';
+  flights.forEach((f) => {
+    const orgFormatted = f.origem.padEnd(maxOrigem, ' ');
+    const dstFormatted = f.destino.padEnd(maxDestino, ' ');
+    res += `${f.cia} ${f.numero} ➔ ${f.data} ➔ ${orgFormatted}${f.partida} ➔ ${dstFormatted}${f.chegada}\n`;
+  });
+
+  return { res, firstCia: flights[0]?.ciaCode || '' };
+};
 
 const Tarifa = () => {
   const { toast } = useToast();
@@ -16,6 +77,7 @@ const Tarifa = () => {
   const [result, setResult] = useState('Aguardando dados...');
   
   const [formData, setFormData] = useState({
+    roteiro: '',
     voo: 'Tap',
     cabine: 'ECONOMY STANDARD',
     bagagem: 'No Bag',
@@ -96,19 +158,55 @@ const Tarifa = () => {
       const feeVal = parseFloat(formData.fee || 0);
       const final = totalBRL + ravVal + feeVal;
 
-      let res = `Cia/Voo: ${formData.voo}\nCabine: ${formData.cabine}\nBagagem: ${formData.bagagem}\n-------------------------------------------\n`;
+      // Processar Roteiro
+      let roteiroHeader = '';
+      let updatedVoo = formData.voo;
+
+      if (formData.roteiro.trim()) {
+        const decoded = decodeItinerary(formData.roteiro);
+        if (decoded && decoded.res) {
+          roteiroHeader = `Roteiro:\n${decoded.res}\n`;
+          if (decoded.firstCia && (!formData.voo || formData.voo === 'Tap')) {
+            updatedVoo = decoded.firstCia;
+            setFormData(prev => ({ ...prev, voo: decoded.firstCia }));
+          }
+        } else {
+          roteiroHeader = `Roteiro:   ${formData.roteiro}\n`;
+        }
+      }
+
+      const formatMetaLine = (label, value) => {
+        return `${label.padEnd(10, ' ')} ${value}`;
+      };
+
+      let res = roteiroHeader;
+      res += formatMetaLine('Cia/Voo:', updatedVoo) + '\n';
+      res += formatMetaLine('Cabine:', formData.cabine) + '\n';
+      res += formatMetaLine('Bagagem:', formData.bagagem) + '\n';
+      res += '----------------------------------------\n';
       
+      const formatValueLine = (label, currency, val) => {
+        return `${label.padEnd(24, ' ')} ${currency} ${val.toFixed(2).padStart(12, ' ')}`;
+      };
+
       if (tarifaComMarkup) {
-        res += `Tarifa Base USD (original): USD ${tUSDOriginal.toFixed(2)}\n`;
-        res += `Markup (${formData.markup}%):          USD ${(tUSD - tUSDOriginal).toFixed(2)}\n`;
-        res += `Tarifa USD (c/ markup):     USD ${tUSD.toFixed(2).padStart(12)}\n`;
-        res += `Tarifa BRL (c/ markup): BRL ${tBRL.toFixed(2).padStart(12)}\n`;
+        res += formatValueLine('Tarifa Base USD (orig):', 'USD', tUSDOriginal) + '\n';
+        res += formatValueLine(`Markup (${formData.markup}%):`, 'USD', tUSD - tUSDOriginal) + '\n';
+        res += formatValueLine('Tarifa USD (c/ markup):', 'USD', tUSD) + '\n';
+        res += formatValueLine('Tarifa BRL (c/ markup):', 'BRL', tBRL) + '\n';
       } else {
-        res += `Tarifa Base (USD):  USD ${tUSD.toFixed(2).padStart(12)}\n`;
-        res += `Tarifa BRL:         BRL ${tBRL.toFixed(2).padStart(12)}\n`;
+        res += formatValueLine('Tarifa Base (USD):', 'USD', tUSD) + '\n';
+        res += formatValueLine('Tarifa BRL:', 'BRL', tBRL) + '\n';
       }
       
-      res += `Taxas:              BRL ${(totalBRL - tBRL).toFixed(2).padStart(12)}\nTotal Parcial:      BRL ${totalBRL.toFixed(2).padStart(12)}\nRAV (${formData.rav}%):          BRL ${ravVal.toFixed(2).padStart(12)}\nFEE:                BRL ${feeVal.toFixed(2).padStart(12)}\n-------------------------------------------\nTOTAL FINAL:        BRL ${final.toFixed(2).padStart(12)}\n-------------------------------------------\nPagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
+      res += formatValueLine('Taxas:', 'BRL', totalBRL - tBRL) + '\n';
+      res += formatValueLine('Total Parcial:', 'BRL', totalBRL) + '\n';
+      res += formatValueLine(`RAV (${formData.rav}%):`, 'BRL', ravVal) + '\n';
+      res += formatValueLine('FEE:', 'BRL', feeVal) + '\n';
+      res += '----------------------------------------\n';
+      res += formatValueLine('TOTAL FINAL:', 'BRL', final) + '\n';
+      res += '----------------------------------------\n';
+      res += `Pagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
 
       setResult(res);
 
@@ -177,6 +275,19 @@ const Tarifa = () => {
         >
           SABRE
         </Button>
+      </div>
+
+      {/* Roteiro Textarea */}
+      <div className="mb-4">
+        <Label>Roteiro / Linhas de Voo (GDS ou texto simples)</Label>
+        <Textarea
+          rows={3}
+          placeholder="Cole as linhas de voo do GDS ou digite o roteiro simples (Ex: GRU/MIA/GRU)..."
+          value={formData.roteiro}
+          onChange={(e) => setFormData({ ...formData, roteiro: e.target.value })}
+          className="font-mono text-sm"
+          data-testid="roteiro-input"
+        />
       </div>
 
       {/* Input Textarea */}
