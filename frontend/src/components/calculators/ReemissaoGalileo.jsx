@@ -1,3 +1,4 @@
+import { applyMarginMarkup, parseMarkup, parseNonNegative } from '@/utils/financial';
 import React, { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -150,19 +151,24 @@ const ReemissaoGalileo = () => {
         return;
       }
 
+      const markupValidado = formData.aplicarMarkup ? parseMarkup(formData.markup) : 0;
+      parseNonNegative(formData.feeUSD, 'FEE');
+      parseNonNegative(formData.ravPercent, 'RAV');
+      parseNonNegative(formData.ravMinimo, 'RAV mínimo');
+
       // APLICAR MARKUP se ativo
       let oldBaseFareUSDOriginal = oldBaseFareUSD;
       let newBaseFareUSDOriginal = newBaseFareUSD;
       let tarifaComMarkup = false;
       
-      if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
-        const markupPercent = parseFloat(formData.markup);
+      if (formData.aplicarMarkup && markupValidado > 0) {
+        const markupPercent = markupValidado;
         
         if (oldBaseFareUSD > 0) {
-          oldBaseFareUSD = oldBaseFareUSD / (1 - markupPercent / 100);
+          oldBaseFareUSD = applyMarginMarkup(oldBaseFareUSD, markupPercent);
         }
         if (newBaseFareUSD > 0) {
-          newBaseFareUSD = newBaseFareUSD / (1 - markupPercent / 100);
+          newBaseFareUSD = applyMarginMarkup(newBaseFareUSD, markupPercent);
         }
         
         tarifaComMarkup = true;
@@ -260,7 +266,7 @@ const ReemissaoGalileo = () => {
       console.error('Erro:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar reemissão.",
+        description: error.message || "Erro ao processar reemissão.",
         variant: "destructive",
       });
     }
