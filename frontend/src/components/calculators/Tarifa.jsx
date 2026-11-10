@@ -1,3 +1,4 @@
+import { applyMarginMarkup, parseMarkup, parseNonNegative, parsePositive, roundCurrency } from '@/utils/financial';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -122,17 +123,22 @@ const Tarifa = () => {
         totalBRL = totM ? parseFloat(totM[1]) : 0;
       }
 
+      if (!Number.isFinite(tUSD) || !Number.isFinite(tBRL) || !Number.isFinite(totalBRL) || tBRL < 0 || totalBRL < tBRL) { throw new Error('Valores da tarifa ou taxas inválidos'); }
+      const feeValidado = parseNonNegative(formData.fee || '0', 'FEE');
+      const ravValidado = parseNonNegative(formData.rav, 'RAV');
+      const markupValidado = formData.aplicarMarkup ? parseMarkup(formData.markup) : 0;
+
       // APLICAR MARKUP se ativo
       let tUSDOriginal = tUSD;
       let tBRLOriginal = tBRL;
       let totalBRLOriginal = totalBRL;
       let tarifaComMarkup = false;
       
-      if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
-        const markupPercent = parseFloat(formData.markup);
+      if (formData.aplicarMarkup && markupValidado > 0) {
+        const markupPercent = markupValidado;
         
         // Calcular novo USD com markup
-        tUSD = tUSD / (1 - markupPercent / 100);
+        tUSD = applyMarginMarkup(tUSD, markupPercent);
         
         // Recalcular BRL baseado no novo USD
         // Extrair cotação do GDS (RATE USED ou calcular)
@@ -154,9 +160,9 @@ const Tarifa = () => {
         tarifaComMarkup = true;
       }
 
-      const ravVal = tBRL * (parseFloat(formData.rav) / 100);
-      const feeVal = parseFloat(formData.fee || 0);
-      const final = totalBRL + ravVal + feeVal;
+      const ravVal = roundCurrency(tBRL * (ravValidado / 100));
+      const feeVal = feeValidado;
+      const final = roundCurrency(totalBRL + ravVal + feeVal);
 
       // Processar Roteiro
       let roteiroHeader = '';
@@ -227,7 +233,7 @@ const Tarifa = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Erro ao processar tarifa. Verifique os dados.",
+        description: error.message || "Erro ao processar tarifa. Verifique os dados.",
         variant: "destructive",
       });
     }
