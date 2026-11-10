@@ -75,6 +75,7 @@ const Tarifa = () => {
   const [gds, setGds] = useState('amadeus');
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState('Aguardando dados...');
+  const [conferencia, setConferencia] = useState('');
   
   const [formData, setFormData] = useState({
     roteiro: '',
@@ -128,6 +129,7 @@ const Tarifa = () => {
       let totalBRLOriginal = totalBRL;
       let tarifaComMarkup = false;
       
+      if (formData.aplicarMarkup && (Number(formData.markup) < 0 || Number(formData.markup) >= 100 || !Number.isFinite(Number(formData.markup)))) { throw new Error('Markup deve ser de 0% a menos de 100%'); }
       if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
         const markupPercent = parseFloat(formData.markup);
         
@@ -189,15 +191,9 @@ const Tarifa = () => {
         return `${label.padEnd(24, ' ')} ${currency} ${val.toFixed(2).padStart(12, ' ')}`;
       };
 
-      if (tarifaComMarkup) {
-        res += formatValueLine('Tarifa Base USD (orig):', 'USD', tUSDOriginal) + '\n';
-        res += formatValueLine(`Markup (${formData.markup}%):`, 'USD', tUSD - tUSDOriginal) + '\n';
-        res += formatValueLine('Tarifa USD (c/ markup):', 'USD', tUSD) + '\n';
-        res += formatValueLine('Tarifa BRL (c/ markup):', 'BRL', tBRL) + '\n';
-      } else {
-        res += formatValueLine('Tarifa Base (USD):', 'USD', tUSD) + '\n';
-        res += formatValueLine('Tarifa BRL:', 'BRL', tBRL) + '\n';
-      }
+      // Valores comerciais: USD e BRL representam a mesma tarifa de venda.
+      res += formatValueLine('Tarifa Base (USD):', 'USD', tUSD) + '\n';
+      res += formatValueLine('Tarifa BRL:', 'BRL', tBRL) + '\n';
       
       res += formatValueLine('Taxas:', 'BRL', totalBRL - tBRL) + '\n';
       res += formatValueLine('Total Parcial:', 'BRL', totalBRL) + '\n';
@@ -208,7 +204,21 @@ const Tarifa = () => {
       res += '----------------------------------------\n';
       res += `Pagamento: ${formData.parcelamento}\n\n[ REGRAS E PENALIDADES ]\nReemissão: USD ${formData.multaReem || 'N/A'}\nReembolso: USD ${formData.multaReeb || 'N/A'}\n\n* Tarifa válida por 12 meses da data de emissão.`;
 
+      const conferenciaInterna = tarifaComMarkup
+        ? [
+            '--- CONFERÊNCIA (não enviar) ---',
+            formatValueLine('Tarifa base USD (net):', 'USD', tUSDOriginal),
+            formatValueLine(`Markup (${formData.markup}%):`, 'USD', tUSD - tUSDOriginal),
+            formatValueLine('Tarifa USD c/ markup:', 'USD', tUSD),
+            formatValueLine('Tarifa BRL c/ markup:', 'BRL', tBRL),
+            formatValueLine('Taxas:', 'BRL', totalBRL - tBRL),
+            formatValueLine('Total Parcial:', 'BRL', totalBRL),
+            formatValueLine(`RAV (${formData.rav}%):`, 'BRL', ravVal),
+            formatValueLine('FEE:', 'BRL', feeVal),
+          ].join('\n')
+        : '';
       setResult(res);
+      setConferencia(conferenciaInterna);
 
       // Save calculation
       try {
@@ -227,7 +237,7 @@ const Tarifa = () => {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Erro ao processar tarifa. Verifique os dados.",
+        description: error.message || "Erro ao processar tarifa. Verifique os dados.",
         variant: "destructive",
       });
     }
@@ -417,6 +427,11 @@ const Tarifa = () => {
       <div className="bg-[#1a202c] text-green-400 p-4 rounded-md font-mono text-sm whitespace-pre-wrap" data-testid="tarifa-result">
         {result}
       </div>
+      {conferencia && (
+        <div className="mt-4 bg-[#1a202c] text-amber-300 p-4 rounded-md font-mono text-sm whitespace-pre-wrap" data-testid="tarifa-conferencia-interna">
+          {conferencia}
+        </div>
+      )}
     </Card>
   );
 };
