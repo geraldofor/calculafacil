@@ -1,3 +1,4 @@
+import { applyMarginMarkup, parseMarkup, parseNonNegative, parsePositive } from '@/utils/financial';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,21 +94,26 @@ const Reemissao = () => {
       const totalAddColBRL = extractValueAmadeus(patterns.totalAddCollBRL);
       const nonRefundableTaxBRL = extractValueAmadeus(patterns.nonRefundableTaxBRL);
 
+      const markupValidado = formData.aplicarMarkup ? parseMarkup(formData.markup) : 0;
+      parseNonNegative(formData.feeUSD, 'FEE');
+      parseNonNegative(formData.ravPercent, 'RAV');
+      parseNonNegative(formData.ravMinimo, 'RAV mínimo');
+
       // APLICAR MARKUP se ativo
       let oldBaseFareUSDOriginal = oldBaseFareUSD;
       let newBaseFareUSDOriginal = newBaseFareUSD;
       let fareBalanceBRLOriginal = fareBalanceBRL;
       let tarifaComMarkup = false;
       
-      if (formData.aplicarMarkup && parseFloat(formData.markup) > 0) {
-        const markupPercent = parseFloat(formData.markup);
+      if (formData.aplicarMarkup && markupValidado > 0) {
+        const markupPercent = markupValidado;
         
         // Aplicar markup nas tarifas USD
         if (oldBaseFareUSD > 0) {
-          oldBaseFareUSD = oldBaseFareUSD / (1 - markupPercent / 100);
+          oldBaseFareUSD = applyMarginMarkup(oldBaseFareUSD, markupPercent);
         }
         if (newBaseFareUSD > 0) {
-          newBaseFareUSD = newBaseFareUSD / (1 - markupPercent / 100);
+          newBaseFareUSD = applyMarginMarkup(newBaseFareUSD, markupPercent);
         }
         
         // Recalcular FARE BALANCE em BRL com markup
@@ -279,7 +285,7 @@ const Reemissao = () => {
       console.error('Erro:', error);
       toast({
         title: "Erro",
-        description: "Erro ao processar reemissão. Verifique os dados.",
+        description: error.message || "Erro ao processar reemissão. Verifique os dados.",
         variant: "destructive",
       });
     }
